@@ -1,5 +1,7 @@
 import sys
 
+operators = ['+','-','*','/']
+
 #Stores a state which can be expanded 
 class State:
 
@@ -10,21 +12,24 @@ class State:
         #Records the numbers which have been used in the equation already
         #This is easier than processing the equation string for if the number is in the string
         self.usedNums = usedNums
+    
+    def __str__(self):
+        return self.eqn
 
     #Evaluates the value of the state
-    def Evaluate():
-        return eval(eqn)
+    def Evaluate(self):
+        return eval(self.eqn)
 
     #Expands the current state into more states
-    def Expand(nums, operators):
+    def Expand(self, nums, operators):
         #Holds the values of the new states
         newStates = []
 
         #For each of the possible numbers to use
         for num in nums:
-            if not num in usedNums:
+            if not num in self.usedNums:
                 #Creates a new list of the used numbers
-                newUsedNums = usedNums.copy()
+                newUsedNums = self.usedNums.copy()
                 #Adds the new number to this list
                 newUsedNums.append(num)
 
@@ -37,10 +42,64 @@ class State:
                     
         return newStates
 
+#Initialises the queue
+def InitialiseQueue(arr):
+    queue = []
+    for i in arr:
+        queue.append(State(str(i), [i]))
+        queue.append(State('-' + str(i), [i]))
+    return queue
+
+#Converts the input list of strings into ints
+def convertToIntList(arr):
+    nums = []
+    try:
+        for i in arr:
+            nums.append(int(i))
+        return nums
+    except:
+        return None
 
 def main(arr):
+    #If the correct number of inputs were used
     if(len(arr) == 0):
         ValidInput()
+    else:
+        nums = convertToIntList(arr)
+        if nums is None:
+            ValidInput()
+        else:
+            #The input was valid
+            target = nums[-1]
+            nums = nums[:-1]
+            queue = InitialiseQueue(nums)
+
+            #Records the best state
+            bestState = None
+            bestValue = 0
+
+            while(True):
+                #Removes the first item in the queue
+                state = queue.pop(0)
+                value = state.Evaluate()
+
+                #If the value is closer to the target than the current one
+                if abs(target - value) < abs(target - bestValue):
+                    bestState = state
+                    bestValue = value                    
+                #If the value is the target value
+                if value == target:
+                    break
+
+                #Expand the current state
+                queue.extend(state.Expand(nums, operators))
+
+
+
+def printQueue(queue):
+    for i in queue:
+        print(i)
+
 
 def ValidInput():
     print('Valid Input:\nMultiple numbers\nA Target Number\ne.g. python3 Countdown.py 2 3 4 5 100')
