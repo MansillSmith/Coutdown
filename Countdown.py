@@ -36,9 +36,9 @@ class State:
                 #Adds the new number with each operator
                 for op in operators:
                     #Creates the new states
+                    newStates.append(State(self.eqn+op+str(num), newUsedNums))
                     if not op == '+' and not op == '-':                    
                         newStates.append(State(self.eqn+op+'-'+str(num), newUsedNums))
-                    newStates.append(State(self.eqn+op+str(num), newUsedNums))
                     
         return newStates
 
@@ -78,7 +78,8 @@ def main(arr):
             bestState = None
             bestValue = 0
 
-            while(True):
+            #While the queue is not empty
+            while(queue):
                 #Removes the first item in the queue
                 state = queue.pop(0)
                 value = state.Evaluate()
@@ -94,6 +95,8 @@ def main(arr):
                 #Expand the current state
                 queue.extend(state.Expand(nums, operators))
 
+            print(bestState)
+            print(bestValue)
 
 
 def printQueue(queue):
